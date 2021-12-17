@@ -9,20 +9,22 @@ function getParsedFileContent(filename) {
   }
 }
 
-function getArea(length, width, height) {
-  const topArea = length * width;
-  const widthArea = width * height;
-  const lengthArea = length * height;
+function getBowLength(length, width, height) {
+  const perimeters = [
+    2 * length + 2 * width,
+    2 * length + 2 * height,
+    2 * width + 2 * height,
+  ];
 
-  const minArea = Math.min(topArea, widthArea, lengthArea);
-  return 2 * topArea + 2 * widthArea + 2 * lengthArea + minArea;
+  const minPerimeter = Math.min.apply(null, perimeters);
+  return minPerimeter + length * width * height;
 }
 
-console.assert(getArea(2, 3, 4) === 58);
-console.assert(getArea(1, 1, 10) === 43);
+console.assert(getBowLength(2, 3, 4) === 34);
+console.assert(getBowLength(1, 1, 10) === 14);
 
 //puzzle
-const totalArea = getParsedFileContent("puzzle-input.txt")
-  .map((dimensions) => getArea(...dimensions))
+const totalLength = getParsedFileContent("puzzle-input.txt")
+  .map((dimensions) => getBowLength(...dimensions))
   .reduce((acc, next) => acc + next, 0);
-console.log(totalArea); //1598415
+console.log(totalLength); //5875601362
