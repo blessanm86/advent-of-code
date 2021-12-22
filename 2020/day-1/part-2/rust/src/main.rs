@@ -7,33 +7,6 @@ fn parse_input(input: &str) -> Vec<u32> {
         .collect::<Vec<u32>>()
 }
 
-// fn solve(expenses: &Vec<u32>, count: u32, total: u32, sum: u32) -> Option<&Vec<u32>> {
-//     if count == 1 {
-//         let result = expenses.into_iter().position(|x| x + sum == total);
-//         let empty: Vec<u32> = vec![];
-//         return match result {
-//             Some(x) => Some(slice::from_ref(&expenses[x])),
-//             None => Some(&empty),
-//         };
-//     }
-//
-//     for i in 0..expenses.len() {
-//         println!("{:?}", expenses[i]);
-//         let num = solve(&expenses[i + 1..], count - 1, total, expenses[i] + sum).unwrap();
-//
-//         if num.len() > 0 {
-//             let mut nums: Vec<u32> = vec![expenses[i]];
-//             for &i in num {
-//                 nums.push(i);
-//             }
-//
-//             return Some(nums);
-//         }
-//     }
-//
-//     None
-// }
-
 fn calc(expenses: &[u32], count: u32, total: u32, sum: u32) -> Option<Vec<u32>> {
     if count == 1 {
         let result = expenses.into_iter().position(|x| x + sum == total);
@@ -44,15 +17,20 @@ fn calc(expenses: &[u32], count: u32, total: u32, sum: u32) -> Option<Vec<u32>> 
     }
 
     for i in 0..expenses.len() {
-        let num = calc(&expenses[i + 1..], count - 1, total, expenses[i] + sum).unwrap();
+        let result = calc(&expenses[i + 1..], count - 1, total, expenses[i] + sum);
 
-        if num.len() > 0 {
-            let mut nums: Vec<u32> = vec![expenses[i]];
-            for i in num {
-                nums.push(i);
+        match result {
+            Some(res) => {
+                if res.len() > 0 {
+                    let mut nums: Vec<u32> = vec![expenses[i]];
+                    for i in res {
+                        nums.push(i);
+                    }
+
+                    return Some(nums);
+                }
             }
-
-            return Some(nums);
+            _ => {}
         }
     }
 
@@ -67,7 +45,10 @@ fn main() {
         vec![1721, 299]
     );
 
-    // let input = fs::read_to_string("./src/input.txt").expect("Error reading the file");
-    // let parsed_input = parse_input(&input);
-    // assert_eq!(calc(&parse_inputarsed_input, 3, 2020, 0).unwrap(), vec![1721, 299]);
+    let input = fs::read_to_string("./src/input.txt").expect("Error reading the file");
+    let parsed_input = parse_input(&input);
+    assert_eq!(
+        calc(&parsed_input, 3, 2020, 0).unwrap(),
+        vec![928, 547, 545]
+    );
 }
