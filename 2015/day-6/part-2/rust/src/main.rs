@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::collections::HashMap;
-use std::fs;
+use std::{cmp, fs};
 
 #[derive(Debug)]
 struct Instruction {
@@ -90,18 +90,14 @@ impl<T: Copy + Clone> Matrix<T> {
         }
     }
 
-    fn _get_values(&self) -> Vec<T> {
+    fn get_values(&self) -> Vec<T> {
         self.matrix.iter().map(|(_, v)| *v).collect()
-    }
-
-    fn get_count(&self, filter_fn: fn(x: T) -> bool) -> usize {
-        self.matrix.iter().filter(|(_, &v)| filter_fn(v)).count()
     }
 }
 
-fn solve(input: &str) -> usize {
+fn solve(input: &str) -> i32 {
     let input = parse_input(&input);
-    let mut matrix = Matrix::new(1000, 1000, false);
+    let mut matrix: Matrix<i32> = Matrix::new(1000, 1000, 0);
 
     input.iter().for_each(|ins| {
         if ins.action == "turn on" {
@@ -110,7 +106,7 @@ fn solve(input: &str) -> usize {
                 ins.start_col,
                 ins.end_row,
                 ins.end_col,
-                |_| true,
+                |x| x + 1,
             );
         } else if ins.action == "turn off" {
             matrix.set_range(
@@ -118,7 +114,7 @@ fn solve(input: &str) -> usize {
                 ins.start_col,
                 ins.end_row,
                 ins.end_col,
-                |_| false,
+                |x| cmp::max(x - 1, 0),
             );
         } else {
             matrix.set_range(
@@ -126,25 +122,24 @@ fn solve(input: &str) -> usize {
                 ins.start_col,
                 ins.end_row,
                 ins.end_col,
-                |x| !x,
+                |x| x + 2,
             );
         }
     });
 
-    matrix.get_count(|x| x)
+    matrix.get_values().iter().fold(0, |acc, x| acc + x)
 }
 
 fn main() {
     let test_input = "
-    turn on 0,0 through 999,999
-    toggle 0,0 through 999,0
-    turn off 499,499 through 500,500
+    turn on 0,0 through 0,0
+    toggle 0,0 through 999,999
     ";
 
     let result = solve(&test_input);
-    println!("{}", result); //998996
+    println!("{}", result); //2000001
 
     let input = fs::read_to_string("./src/input.txt").expect("error reading file");
     let result = solve(&input);
-    println!("{}", result); //377891
+    println!("{}", result); //14110788
 }
